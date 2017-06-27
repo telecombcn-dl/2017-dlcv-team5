@@ -1,5 +1,4 @@
-# 2017-dlcv-team5
-Team 5 in the Deep Learning for Computer Vision Summer School 2017 at UPC TelecomBCN.
+# Team 5 in the Deep Learning for Computer Vision Summer School 2017 at UPC TelecomBCN.
 
 Team 5 consists of 4 people:
 
