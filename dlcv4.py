@@ -12,18 +12,15 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-
 # dimensions of our images.
 img_width, img_height = 224, 224
 
-top_model_weights_path = '/imatge/mcata/Terrassa/bottleneck_fc_model.h5'
-dir = "/imatge/mcata/Terrassa/"
-train_data_dir = '/imatge/mcata/Terrassa/train'
-validation_data_dir = '/imatge/mcata/Terrassa/val'
+top_model_weights_path = '/home/dlcv/bottleneck_fc_model.h5'
+dir = "/home/dlcv/TerrassaBuildings900/"
 nb_train_samples = 450
 nb_validation_samples = 180
-epochs = 20
-batch_size = 10
+epochs = 200
+batch_size = 20
 
 # Load dict images
 def load_image(dir, type):
@@ -93,56 +90,97 @@ print('y_val shape:', y_val.shape)
 #y_train = np.array(y_train)
 #y_val = np.array(y_val)
 
-
 x_train = x_train.astype('float32')
 x_val = x_val.astype('float32')
 x_train /= 255
 x_val /= 255
+
 y_train = to_categorical(y_train, 13)
 y_val = to_categorical(y_val, 13)
 
-model = applications.VGG16(include_top=True, weights='imagenet', input_shape=(img_width, img_height, 3))
-print('model loaded')
-model.layers.pop()
-model.outputs = [model.layers[-1].output]
-model.layers[-1].outbound_nodes = []
-model.add(Dense(13, activation='softmax'))
+def save_bottleneck_features():
 
 
-model.compile(optimizer='rmsprop',
-              loss='categorical_crossentropy', metrics=['accuracy'])
+    # build the VGG16 network
+    model = applications.VGG19(include_top=False, weights='imagenet', input_shape=(img_width, img_height, 3))
+    print('model loaded')
+
+    bottleneck_features_train = model.predict(
+        x_train, batch_size=batch_size)
+    np.save(open(dir+'bottleneck_features_train_t4.npy', 'w'),
+            bottleneck_features_train)
+    print('pretrained features obtained')
+
+    bottleneck_features_validation = model.predict(
+        x_val, batch_size=batch_size)# nb_validation_samples // batch_size + 1)
+    np.save(open(dir+'bottleneck_features_validation_t4.npy', 'w'),
+            bottleneck_features_validation)
+    print('pretrained val features obtained')
+
+def train_top_model():
 
 
-print('model compiled')
-print(model.output_shape)
-history = model.fit(x_train, y_train,
-          epochs=epochs,
-          batch_size=batch_size,
-          validation_data=(x_val, y_val))
-print('top model trained')
+    train_data = np.load(open(dir+'bottleneck_features_train_t4.npy'))
+    train_labels = y_train
 
-model.save_weights(top_model_weights_path)
-# list all data in history
-print(history.history.keys())
-fig, axis = plt.subplots(1,2)#,figsize=(15,5))
+    validation_data = np.load(open(dir+'bottleneck_features_validation_t4.npy'))
+    validation_labels = y_val
+
+    model = Sequential()
+    model.add(Flatten(input_shape=train_data.shape[1:]))
+    model.add(Dense(2048, activation='relu'))
+    model.add(Dense(256, activation='relu'))
+    model.add(Dense(13, activation='softmax'))
+
+    for layer in model.layers[:-1]:
+        layer.trainable = False
+
+    model.compile(optimizer='rmsprop',
+                  loss='categorical_crossentropy', metrics=['accuracy'])
+
+
+    print('top model compiled')
+    print(model.output_shape)
+    #print(model.layers_by_depth)
+    #print(model.)
+
+    print('ara venen les shapes')
+    print(train_data.shape)
+    print(train_labels.shape)
+    print(validation_data.shape)
+    print(validation_labels.shape)
+
+    history = model.fit(train_data, train_labels,
+              epochs=epochs,
+              batch_size=batch_size,
+              validation_data=(validation_data, validation_labels))
+    print('top model trained')
+
+    model.save_weights(top_model_weights_path)
+    # list all data in history
+    print(history.history.keys())
+    fig, axis = plt.subplots(1,2)#,figsize=(15,5))
 
     # summarize history for accuracy
 
-axis[0].plot(history.history['acc'])
-axis[0].plot(history.history['val_acc'])
-axis[0].set_title('model accuracy')
-axis[0].set_ylabel('accuracy')
-axis[0].set_xlabel('epoch')
-axis[0].legend(['train', 'test'], loc='upper left')
-#plt.show()
-#axis axis[0].savefig('/imatge/mcata/Terrassa/accuracy_22.png')
-# summarize history for loss
+    axis[0].plot(history.history['acc'])
+    axis[0].plot(history.history['val_acc'])
+    axis[0].set_title('model accuracy')
+    axis[0].set_ylabel('accuracy')
+    axis[0].set_xlabel('epoch')
+    axis[0].legend(['train', 'test'], loc='upper left')
+    #plt.show()
+    #axis axis[0].savefig('/imatge/mcata/Terrassa/accuracy_22.png')
+    # summarize history for loss
 
-axis[1].plot(history.history['loss'])
-axis[1].plot(history.history['val_loss'])
-axis[1].set_title('model loss')
-axis[1].set_ylabel('loss')
-axis[1].set_xlabel('epoch')
-axis[1].legend(['train', 'test'], loc='upper left')
-#plt.show()
-plt.savefig('/imatge/mcata/Terrassa/task_4.png')
+    axis[1].plot(history.history['loss'])
+    axis[1].plot(history.history['val_loss'])
+    axis[1].set_title('model loss')
+    axis[1].set_ylabel('loss')
+    axis[1].set_xlabel('epoch')
+    axis[1].legend(['train', 'test'], loc='upper left')
+    #plt.show()
+    plt.savefig('/home/dlcv/task_4_vgg19.png')
+
+save_bottleneck_features()
+train_top_model()
