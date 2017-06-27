@@ -10,7 +10,7 @@ Nicolás Ugrinovic
 
 Our project consisted on using a YOLO architecture in order to be able to detect cars. This project can be applied in the field of smart cars.
 
-#Project YOLO
+# Project YOLO
 
 In this project we have used the YOLO detection system trained using the UDACITY dataset, with the objective to provide an algorithm for car detection in images.
 
