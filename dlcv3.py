@@ -16,10 +16,8 @@ import matplotlib.pyplot as plt
 # dimensions of our images.
 img_width, img_height = 224, 224
 
-top_model_weights_path = '/imatge/mcata/Terrassa/bottleneck_fc_model.h5'
-dir = "/imatge/mcata/Terrassa/"
-train_data_dir = '/imatge/mcata/Terrassa/train'
-validation_data_dir = '/imatge/mcata/Terrassa/val'
+top_model_weights_path = '/home/dlcv/bottleneck_fc_model.h5'
+dir = "/home/dlcv/TerrassaBuildings900/"
 nb_train_samples = 450
 nb_validation_samples = 180
 epochs = 20
@@ -157,5 +155,5 @@ axis[1].set_ylabel('loss')
 axis[1].set_xlabel('epoch')
 axis[1].legend(['train', 'test'], loc='upper left')
 #plt.show()
-plt.savefig('/imatge/mcata/Terrassa/task_3.png')
+plt.savefig('/home/dlcv/task_3.png')
 

@@ -17,7 +17,7 @@ batch_size = 20
 num_classes = 13
 epochs = 100
 data_augmentation = False
-dir = "/imatge/mcata/Terrassa/"
+dir = "/home/dlcv/TerrassaBuildings900/"
 type=''
 
 img_width, img_height = 32,32
@@ -98,7 +98,7 @@ print('y_val shape:', y_val.shape)
 y_train = keras.utils.to_categorical(y_train, num_classes)
 y_val = keras.utils.to_categorical(y_val, num_classes)
 
-model = load_model('/imatge/mcata/Terrassa/modelo.h5')
+model = load_model('/home/dlcv/modelo.h5')
 
 model.layers.pop()
 model.outputs = [model.layers[-1].output]
@@ -115,9 +115,6 @@ opt = keras.optimizers.rmsprop(lr=0.0001, decay=1e-6)
 model.compile(loss='categorical_crossentropy',
               optimizer=opt,
               metrics=['accuracy'])
-print (model.input_shape)
-print(model.output_shape)
-print ('aquesta es la output shape')
 x_train = x_train.astype('float32')
 x_val = x_val.astype('float32')
 x_train /= 255
@@ -180,4 +177,4 @@ axis[1].set_ylabel('loss')
 axis[1].set_xlabel('epoch')
 axis[1].legend(['train', 'test'], loc='upper left')
 #plt.show()
-plt.savefig('/imatge/mcata/Terrassa/task_21.png')
+plt.savefig('/home/dlcv/task_21.png')

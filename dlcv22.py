@@ -15,10 +15,8 @@ import matplotlib.pyplot as plt
 # dimensions of our images.
 img_width, img_height = 224, 224
 
-top_model_weights_path = '/imatge/mcata/Terrassa/bottleneck_fc_model.h5'
-dir = "/imatge/mcata/Terrassa/"
-train_data_dir = '/imatge/mcata/Terrassa/train'
-validation_data_dir = '/imatge/mcata/Terrassa/val'
+top_model_weights_path = '/home/dlcv/bottleneck_fc_model.h5'
+dir = "/home/dlcv/TerrassaBuildings900/"
 nb_train_samples = 450
 nb_validation_samples = 180
 epochs = 150
@@ -112,6 +110,7 @@ def save_bottleneck_features():
     np.save(open(dir+'bottleneck_features_train.npy', 'w'),
             bottleneck_features_train)
     print('pretrained features obtained')
+
     bottleneck_features_validation = model.predict(
         x_val, batch_size=batch_size)# nb_validation_samples // batch_size + 1)
     np.save(open(dir+'bottleneck_features_validation.npy', 'w'),
@@ -145,12 +144,6 @@ def train_top_model():
     #print(model.layers_by_depth)
     #print(model.)
 
-    print('ara venen les shapes')
-    print(train_data.shape)
-    print(train_labels.shape)
-    print(validation_data.shape)
-    print(validation_labels.shape)
-
     history = model.fit(train_data, train_labels,
               epochs=epochs,
               batch_size=batch_size,
@@ -181,7 +174,7 @@ def train_top_model():
     axis[1].set_xlabel('epoch')
     axis[1].legend(['train', 'test'], loc='upper left')
     #plt.show()
-    plt.savefig('/imatge/mcata/Terrassa/task_22_onlysoftmax.png')
+    plt.savefig('/home/dlcv/task_22_onlysoftmax.png')
 
 save_bottleneck_features()
 train_top_model()
